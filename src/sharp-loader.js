@@ -5,7 +5,14 @@ import sharp from 'sharp'
 
 const splitIfString = z => (typeof z === 'string' ? z.split('+') : z)
 const ensureArray = z => (Array.isArray(z) ? z : [])
-const DEFAULT_OPTIONS = { sizes: [], lqip: false, webp: false, emitFile: true, esModule: true }
+const DEFAULT_OPTIONS = {
+  sizes: [],
+  lqip: false,
+  webp: false,
+  origin: false,
+  emitFile: true,
+  esModule: true,
+}
 
 /**
  * @param {string | Buffer} source
@@ -29,17 +36,17 @@ export default async function sharpLoader(source) {
   }).split('.')
   const outputs = {
     sizes: {
-      origin: `img/${hash}.${ext}`,
       srcSet: options.sizes.map(s => `img/${hash}.${s}.${ext} ${s}`).join(','),
       ...options.sizes.reduce((a, b) => ({ ...a, [b]: `img/${hash}.${b}.${ext}` }), {}),
     },
+    ...(options.origin ? { origin: `img/${hash}.${ext}` } : {}),
     ...(options.webp ? { webp: `img/${hash}.webp` } : {}),
     ...(options.lqip ? { lqip: await generateLqipAsync(input) } : {}),
     aspectRatio: meta.width / meta.height,
   }
 
   if (options.emitFile) {
-    this.emitFile(outputs.sizes.origin, source)
+    if (options.origin) this.emitFile(outputs.origin, source)
 
     if (options.webp)
       this.emitFile(outputs.webp, await input.clone().webp({ nearLossless: true }).toBuffer())
@@ -53,6 +60,7 @@ export default async function sharpLoader(source) {
   if (options.esModule) {
     return `
 export const sizes = ${JSON.stringify(outputs.sizes)}
+export const origin = ${JSON.stringify(outputs.origin)}
 export const webp = ${JSON.stringify(outputs.webp)}
 export const lqip = ${JSON.stringify(outputs.lqip)}
 export const aspectRatio = ${JSON.stringify(outputs.aspectRatio)}

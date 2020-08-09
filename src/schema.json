@@ -4,6 +4,7 @@
     "sizes": { "type": "array" },
     "lqip": { "type": "boolean" },
     "webp": { "type": "boolean" },
+    "origin": { "type": "boolean" },
     "emitFile": { "type": "boolean" },
     "esModule": { "type": "boolean" }
   },
