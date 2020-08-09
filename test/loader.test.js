@@ -28,7 +28,7 @@ function generateTestFor({ entry, hash, ext, ratio }) {
   return async () => {
     const stats = (await compiler(entry)).toJson()
     const [, normalSrc, allSrc] = stats.modules.map(z => z.source)
-    const getJsonSrc = s => JSON.parse((s + '').replace(/^export default /, ''))
+    const getJsonSrc = s => JSON.parse(/^export default (?<json>.+)$/gim.exec(s).groups['json'])
 
     expect(normalSrc).toEqual(`export default __webpack_public_path__ + "${hash}.${ext}";`)
 

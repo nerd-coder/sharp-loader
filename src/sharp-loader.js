@@ -45,8 +45,16 @@ export default async function sharpLoader(source) {
       this.emitFile(outputs.sizes[size], await input.clone().resize(parsed).toBuffer())
     }
   }
-
-  return `${options.esModule ? 'export default' : 'module.exports ='} ${JSON.stringify(outputs)}`
+  if (options.esModule) {
+    return `
+export const sizes = ${JSON.stringify(outputs.sizes)}
+export const webp = ${JSON.stringify(outputs.webp)}
+export const lqip = ${JSON.stringify(outputs.lqip)}
+export const aspectRatio = ${JSON.stringify(outputs.aspectRatio)}
+export default ${JSON.stringify(outputs)}
+    `
+  }
+  return `module.exports = ${JSON.stringify(outputs)}`
 }
 
 async function generateLqipAsync(input) {
