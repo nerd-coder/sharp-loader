@@ -10,6 +10,9 @@
   },
   "author": "toanzzz",
   "license": "ISC",
+  "publishConfig": {
+    "access": "public"
+  },
   "keywords": [
     "webpack",
     "sharp"
@@ -60,9 +63,6 @@
     "hooks": {
       "before:init": "npm test",
       "after:bump": "npm run build"
-    },
-    "publishConfig": {
-      "access": "public"
     }
   }
 }
