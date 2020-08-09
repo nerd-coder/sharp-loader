@@ -36,11 +36,11 @@ export default async function sharpLoader(source) {
   }).split('.')
   const outputs = {
     sizes: {
-      srcSet: options.sizes.map(s => `img/${hash}.${s}.${ext} ${s}`).join(','),
-      ...options.sizes.reduce((a, b) => ({ ...a, [b]: `img/${hash}.${b}.${ext}` }), {}),
+      srcSet: options.sizes.map(s => `./img/${hash}.${s}.${ext} ${s}`).join(','),
+      ...options.sizes.reduce((a, b) => ({ ...a, [b]: `./img/${hash}.${b}.${ext}` }), {}),
     },
-    ...(options.origin ? { origin: `img/${hash}.${ext}` } : {}),
-    ...(options.webp ? { webp: `img/${hash}.webp` } : {}),
+    ...(options.origin ? { origin: `./img/${hash}.${ext}` } : {}),
+    ...(options.webp ? { webp: `./img/${hash}.webp` } : {}),
     ...(options.lqip ? { lqip: await generateLqipAsync(input) } : {}),
     aspectRatio: meta.width / meta.height,
   }
@@ -58,7 +58,7 @@ export default async function sharpLoader(source) {
     }
   }
   if (options.esModule) {
-    return `
+    return injectWebpackPath(`
 export const sizes = ${JSON.stringify(outputs.sizes)}
 export const origin = ${JSON.stringify(outputs.origin)}
 export const webp = ${JSON.stringify(outputs.webp)}
@@ -66,9 +66,9 @@ export const lqip = ${JSON.stringify(outputs.lqip)}
 export const aspectRatio = ${JSON.stringify(outputs.aspectRatio)}
 export const metadata = ${JSON.stringify(meta)}
 export default ${JSON.stringify(outputs)}
-    `
+    `)
   }
-  return `module.exports = ${JSON.stringify(outputs)}`
+  return injectWebpackPath(`module.exports = ${JSON.stringify(outputs)}`)
 }
 
 async function generateLqipAsync(input) {
@@ -89,4 +89,8 @@ function parseSize(size) {
   const getGroups = v => ensureW(ensureH(v.exec(size).groups))
 
   return getGroups(variant1) || getGroups(variant2)
+}
+
+function injectWebpackPath(s = '') {
+  return s.replace(/\.\/img\//g, `"+__webpack_public_path__+"/img/`)
 }

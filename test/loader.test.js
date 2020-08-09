@@ -1,6 +1,7 @@
 /**
  * @jest-environment node
  */
+import vm from 'vm'
 import compiler from './compiler.js'
 
 test(
@@ -28,7 +29,13 @@ function generateTestFor({ entry, hash, ext, ratio }) {
   return async () => {
     const stats = (await compiler(entry)).toJson()
     const [, normalSrc, allSrc] = stats.modules.map(z => z.source)
-    const getJsonSrc = s => JSON.parse(/^export default (?<json>.+)$/gim.exec(s).groups['json'])
+
+    const getJsonSrc = s => {
+      const json = /^export default (?<json>.+)$/gim.exec(s).groups['json']
+      const sandbox = { val: null, __webpack_public_path__: '' }
+      vm.runInNewContext(`val = ${json}`, sandbox)
+      return sandbox.val
+    }
 
     expect(normalSrc).toEqual(`export default __webpack_public_path__ + "${hash}.${ext}";`)
 
@@ -45,10 +52,10 @@ function generateTestFor({ entry, hash, ext, ratio }) {
     expect(parsedJson.lqip).toMatch(/^data:image\/jpeg;base64,/)
     expect(parsedJson.sizes).toHaveProperty(
       'srcSet',
-      `img/${hash}.200w.${ext} 200w,img/${hash}.800w.${ext} 800w`
+      `/img/${hash}.200w.${ext} 200w,/img/${hash}.800w.${ext} 800w`
     )
-    expect(parsedJson.sizes).toHaveProperty('200w', `img/${hash}.200w.${ext}`)
-    expect(parsedJson.sizes).toHaveProperty('800w', `img/${hash}.800w.${ext}`)
+    expect(parsedJson.sizes).toHaveProperty('200w', `/img/${hash}.200w.${ext}`)
+    expect(parsedJson.sizes).toHaveProperty('800w', `/img/${hash}.800w.${ext}`)
     expect(parsedJson.aspectRatio).toEqual(ratio)
   }
 }
