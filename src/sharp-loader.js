@@ -27,7 +27,6 @@ export default async function sharpLoader(source) {
     context: this.rootContext,
     content: source,
   }).split('.')
-
   const outputs = {
     sizes: {
       origin: `img/${hash}.${ext}`,
@@ -57,6 +56,7 @@ export const sizes = ${JSON.stringify(outputs.sizes)}
 export const webp = ${JSON.stringify(outputs.webp)}
 export const lqip = ${JSON.stringify(outputs.lqip)}
 export const aspectRatio = ${JSON.stringify(outputs.aspectRatio)}
+export const metadata = ${JSON.stringify(meta)}
 export default ${JSON.stringify(outputs)}
     `
   }

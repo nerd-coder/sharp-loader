@@ -37,6 +37,7 @@ function generateTestFor({ entry, hash, ext, ratio }) {
     expect(allSrc).toMatch(/^export const webp = (undefined|\".+\")$/m)
     expect(allSrc).toMatch(/^export const lqip = (undefined|\".+\")$/m)
     expect(allSrc).toMatch(/^export const aspectRatio = (\d+\.?\d*)$/m)
+    expect(allSrc).toMatch(/^export const metadata = \{(.+)\}$/m)
 
     const parsedJson = getJsonSrc(allSrc)
     // expect(all.webp).toEqual(`img/${hash}.${ext}.webp`)
