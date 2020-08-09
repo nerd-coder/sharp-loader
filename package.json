@@ -5,6 +5,7 @@
   "main": "src/index.js",
   "scripts": {
     "test": "jest",
+    "release": "release-it --dry-run",
     "build": "babel src -d dist --copy-files"
   },
   "author": "toanzzz",
@@ -32,6 +33,7 @@
     "cross-env": "^7.0.2",
     "jest": "^26.2.2",
     "memfs": "^3.2.0",
+    "release-it": "*",
     "webpack": "^4.44.1",
     "webpack-cli": "^3.3.12"
   },
@@ -53,5 +55,11 @@
     "printWidth": 100,
     "singleQuote": true,
     "tabWidth": 2
+  },
+  "release-it": {
+    "hooks": {
+      "before:init": "npm test",
+      "after:bump": "npm run build"
+    }
   }
 }
