@@ -1,0 +1,5 @@
+require('./bg.jpg')
+require('./bg.jpg?webp')
+require('./bg.jpg?lqip')
+require('./bg.jpg?sizes=200w+800w')
+require('./bg.jpg?sizes=200w+800w&webp&lqip')

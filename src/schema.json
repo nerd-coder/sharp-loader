@@ -1,0 +1,11 @@
+{
+  "type": "object",
+  "properties": {
+    "sizes": { "type": "array" },
+    "lqip": { "type": "boolean" },
+    "webp": { "type": "boolean" },
+    "emitFile": { "type": "boolean" },
+    "esModule": { "type": "boolean" }
+  },
+  "additionalProperties": false
+}

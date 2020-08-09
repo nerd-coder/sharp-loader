@@ -1,0 +1,5 @@
+require('./favicon.png')
+require('./favicon.png?webp')
+require('./favicon.png?lqip')
+require('./favicon.png?sizes=200w+800w')
+require('./favicon.png?sizes=200w+800w&webp&lqip')

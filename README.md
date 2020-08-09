@@ -1,0 +1,3 @@
+# Sharp Webpack Loader
+
+WIP
