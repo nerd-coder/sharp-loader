@@ -6,10 +6,8 @@ export default async (entry = '') => {
   const webpackConfig = {
     context: __dirname,
     entry: `./example/index.js`,
-    module: {
-      rules: [{ test: /\.(gif|jpe?g|png|svg|tiff)/, use: ['sharp-loader', 'file-loader'] }],
-    },
-    resolveLoader: { alias: { 'sharp-loader': path.resolve(__dirname, '../src/index') } },
+    module: { rules: [{ test: /\.(gif|jpe?g|png|svg|tiff)/, use: ['xloader', 'file-loader'] }] },
+    resolveLoader: { alias: { xloader: path.resolve(__dirname, '../src/index') } },
   }
   const compiler = webpack({ ...webpackConfig, entry })
 

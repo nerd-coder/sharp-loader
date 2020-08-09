@@ -39,8 +39,11 @@ export default async function sharpLoader(source) {
     if (options.webp)
       this.emitFile(outputs.webp, await input.clone().webp({ nearLossless: true }).toBuffer())
 
-    for (const size of options.sizes)
-      this.emitFile(outputs.sizes[size], await input.clone().resize(parseSize(size)).toBuffer())
+    for (const size of options.sizes) {
+      const parsed = parseSize(size)
+      if (!parsed) throw new Error(`Invalid size ${parsed}`)
+      this.emitFile(outputs.sizes[size], await input.clone().resize(parsed).toBuffer())
+    }
   }
 
   return `${options.esModule ? 'export default' : 'module.exports ='} ${JSON.stringify(outputs)}`
@@ -52,9 +55,10 @@ async function generateLqipAsync(input) {
 }
 
 function parseSize(size) {
-  const variant1 = /(?<width>\d)w$/g
-  const variant2 = /(?<width>\d)x(?<height>\d)$/g
+  const variant1 = /^(?<width>\d+)w$/g
+  const variant2 = /^(?<width>\d+)x(?<height>\d+)$/g
   const ensurePropIsNum = p => o => {
+    if (typeof o === 'undefined') return undefined
     o[p] = +o[p] || undefined
     return o
   }
