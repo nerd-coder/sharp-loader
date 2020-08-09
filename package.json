@@ -1,6 +1,6 @@
 {
   "name": "@nerd-coder/sharp-loader",
-  "version": "0.1.1",
+  "version": "0.1.3",
   "description": "Sharp Loader for webpack",
   "main": "dist/index.js",
   "scripts": {
