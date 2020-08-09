@@ -23,19 +23,25 @@ export default async function sharpLoader(source) {
 
   const input = sharp(source)
   const meta = await input.metadata()
+  const [hash, ext] = interpolateName(this, '[contenthash].[ext]', {
+    context: this.rootContext,
+    content: source,
+  }).split('.')
 
-  const _genName = s => interpolateName(this, s, { context: this.rootContext, content: source })
   const outputs = {
-    sizes: options.sizes.reduce(
-      (a, b) => ({ ...a, [b]: _genName(`img/[contenthash].${b}.[ext]`) }),
-      {}
-    ),
-    ...(options.webp ? { webp: _genName('img/[contenthash].[ext].webp') } : {}),
+    sizes: {
+      origin: `img/${hash}.${ext}`,
+      srcSet: options.sizes.map(s => `img/${hash}.${s}.${ext} ${s}`).join(','),
+      ...options.sizes.reduce((a, b) => ({ ...a, [b]: `img/${hash}.${b}.${ext}` }), {}),
+    },
+    ...(options.webp ? { webp: `img/${hash}.webp` } : {}),
     ...(options.lqip ? { lqip: await generateLqipAsync(input) } : {}),
     aspectRatio: meta.width / meta.height,
   }
 
   if (options.emitFile) {
+    this.emitFile(outputs.sizes.origin, source)
+
     if (options.webp)
       this.emitFile(outputs.webp, await input.clone().webp({ nearLossless: true }).toBuffer())
 
