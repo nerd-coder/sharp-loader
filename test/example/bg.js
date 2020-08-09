@@ -1,2 +1,2 @@
 require('./bg.jpg')
-require('./bg.jpg?sizes=200w+800w&webp&lqip')
+require('./bg.jpg?sizes=200w+800w&lqip')

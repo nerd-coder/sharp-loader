@@ -32,11 +32,17 @@ function generateTestFor({ entry, hash, ext, ratio }) {
 
     expect(normalSrc).toEqual(`export default __webpack_public_path__ + "${hash}.${ext}";`)
 
-    const all = getJsonSrc(allSrc)
-    expect(all.webp).toEqual(`img/${hash}.${ext}.webp`)
-    expect(all.lqip).toMatch(/^data:image\/jpeg;base64,/)
-    expect(all.sizes).toHaveProperty('200w', `img/${hash}.200w.${ext}`)
-    expect(all.sizes).toHaveProperty('800w', `img/${hash}.800w.${ext}`)
-    expect(all.aspectRatio).toEqual(ratio)
+    // Check exports
+    expect(allSrc).toMatch(/^export const sizes = \{(.+)\}$/m)
+    expect(allSrc).toMatch(/^export const webp = (undefined|\".+\")$/m)
+    expect(allSrc).toMatch(/^export const lqip = (undefined|\".+\")$/m)
+    expect(allSrc).toMatch(/^export const aspectRatio = (\d+\.?\d*)$/m)
+
+    const parsedJson = getJsonSrc(allSrc)
+    // expect(all.webp).toEqual(`img/${hash}.${ext}.webp`)
+    expect(parsedJson.lqip).toMatch(/^data:image\/jpeg;base64,/)
+    expect(parsedJson.sizes).toHaveProperty('200w', `img/${hash}.200w.${ext}`)
+    expect(parsedJson.sizes).toHaveProperty('800w', `img/${hash}.800w.${ext}`)
+    expect(parsedJson.aspectRatio).toEqual(ratio)
   }
 }
