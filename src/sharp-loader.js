@@ -92,5 +92,5 @@ function parseSize(size) {
 }
 
 function injectWebpackPath(s = '') {
-  return s.replace(/\.\/img\//g, `"+__webpack_public_path__+"/img/`)
+  return s.replace(/\.\/img\//g, `"+__webpack_public_path__+"img/`)
 }

@@ -52,10 +52,10 @@ function generateTestFor({ entry, hash, ext, ratio }) {
     expect(parsedJson.lqip).toMatch(/^data:image\/jpeg;base64,/)
     expect(parsedJson.sizes).toHaveProperty(
       'srcSet',
-      `/img/${hash}.200w.${ext} 200w,/img/${hash}.800w.${ext} 800w`
+      `img/${hash}.200w.${ext} 200w,img/${hash}.800w.${ext} 800w`
     )
-    expect(parsedJson.sizes).toHaveProperty('200w', `/img/${hash}.200w.${ext}`)
-    expect(parsedJson.sizes).toHaveProperty('800w', `/img/${hash}.800w.${ext}`)
+    expect(parsedJson.sizes).toHaveProperty('200w', `img/${hash}.200w.${ext}`)
+    expect(parsedJson.sizes).toHaveProperty('800w', `img/${hash}.800w.${ext}`)
     expect(parsedJson.aspectRatio).toEqual(ratio)
   }
 }
