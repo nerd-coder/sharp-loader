@@ -7,7 +7,7 @@ import compiler from './compiler.js'
 test(
   'bg test',
   generateTestFor({
-    entry: `./example/bg.js`,
+    entry: `require('./img/bg.jpg');require('./img/bg.jpg?sizes=200w+800w&lqip')`,
     hash: 'd5c3766c9be71d504e4c2625b776f4fe',
     ext: 'jpg',
     ratio: 1.7777777777777777,
@@ -17,7 +17,7 @@ test(
 test(
   'favicon test',
   generateTestFor({
-    entry: `./example/favicon.js`,
+    entry: `require('./img/favicon.png');require('./img/favicon.png?sizes=200w+800w&lqip')`,
     hash: '272dc358f350bfb88112b467b709f818',
     ext: 'png',
     ratio: 1,

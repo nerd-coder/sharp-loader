@@ -1,33 +1,32 @@
 import path from 'path'
 import webpack from 'webpack'
+import * as fs from 'fs'
 import { createFsFromVolume, Volume } from 'memfs'
+import { ufs } from 'unionfs'
+
+const WEBPACK_CONFIG = {
+  context: __dirname,
+  module: { rules: [{ test: /\.(gif|jpe?g|png|svg|tiff)/, use: ['xloader', 'file-loader'] }] },
+  resolveLoader: { alias: { xloader: path.resolve(__dirname, '../src/index') } },
+}
+const ENTRY_PATH = path.resolve(__dirname, `./src`)
+
+const runAsync = z => new Promise((res, rej) => z.run((e, s) => (e ? rej(e) : res(s))))
 
 export default async (entry = '') => {
-  const webpackConfig = {
-    context: __dirname,
-    entry: `./example/index.js`,
-    module: { rules: [{ test: /\.(gif|jpe?g|png|svg|tiff)/, use: ['xloader', 'file-loader'] }] },
-    resolveLoader: { alias: { xloader: path.resolve(__dirname, '../src/index') } },
-  }
-  const compiler = webpack({ ...webpackConfig, entry })
+  const compiler = webpack(WEBPACK_CONFIG)
 
-  compiler.outputFileSystem = createFsFromVolume(new Volume())
-  compiler.outputFileSystem.join = path.join.bind(path)
+  const _mfs = createFsFromVolume(Volume.fromJSON({ [ENTRY_PATH]: entry }))
+  const _ufs = ufs.use(fs).use(_mfs)
 
-  return await runAsync(compiler)
-}
+  expect(_ufs.readFileSync(ENTRY_PATH, 'utf8')).toBe(entry)
 
-/**
- * @param {webpack.Compiler} compiler
- * @returns {Promise<webpack.Stats>}
- */
+  compiler.inputFileSystem = _ufs
+  compiler.outputFileSystem = _mfs
+  compiler.outputFileSystem.join = path.join.bind(path) // Patch
 
-async function runAsync(compiler) {
-  return new Promise((resolve, reject) =>
-    compiler.run((err, stats) => {
-      if (err) reject(err)
-      if (stats.hasErrors()) reject(new Error(stats.toJson().errors))
-      resolve(stats)
-    })
-  )
+  const stats = await runAsync(compiler)
+  if (stats.hasErrors()) throw new Error(stats.toJson().errors)
+
+  return stats
 }
