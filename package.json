@@ -6,7 +6,8 @@
   "scripts": {
     "test": "jest",
     "release": "release-it",
-    "release:ci": "release-it patch --ci",
+    "release:patch": "release-it patch --ci",
+    "release:minor": "release-it minor --ci",
     "build": "cross-env NODE_ENV=production babel src -d dist --copy-files"
   },
   "author": "toanzzz",
