@@ -3,8 +3,6 @@ import validateOptions from 'schema-utils'
 import schema from './schema.json'
 import sharp from 'sharp'
 
-const splitIfString = z => (typeof z === 'string' ? z.split('+') : z)
-const ensureArray = z => (Array.isArray(z) ? z : [])
 const DEFAULT_OPTIONS = {
   sizes: [],
   lqip: false,
@@ -13,6 +11,10 @@ const DEFAULT_OPTIONS = {
   emitFile: true,
   esModule: true,
 }
+
+const splitIfString = z => (typeof z === 'string' ? z.split('+') : z)
+const ensureArray = z => (Array.isArray(z) ? z : [])
+const injectWebpackPath = (s = '') => s.replace(/\.\/img\//g, `"+__webpack_public_path__+"img/`)
 
 /**
  * @param {string | Buffer} source
@@ -34,6 +36,7 @@ export default async function sharpLoader(source) {
     context: this.rootContext,
     content: source,
   }).split('.')
+
   const outputs = {
     sizes: {
       srcSet: options.sizes.map(s => `./img/${hash}.${s}.${ext} ${s}`).join(','),
@@ -57,8 +60,10 @@ export default async function sharpLoader(source) {
       this.emitFile(outputs.sizes[size], await input.clone().resize(parsed).toBuffer())
     }
   }
-  if (options.esModule) {
-    return injectWebpackPath(`
+
+  if (!options.esModule) return injectWebpackPath(`module.exports = ${JSON.stringify(outputs)}`)
+
+  return injectWebpackPath(`
 export const sizes = ${JSON.stringify(outputs.sizes)}
 export const origin = ${JSON.stringify(outputs.origin)}
 export const webp = ${JSON.stringify(outputs.webp)}
@@ -66,9 +71,7 @@ export const lqip = ${JSON.stringify(outputs.lqip)}
 export const aspectRatio = ${JSON.stringify(outputs.aspectRatio)}
 export const metadata = ${JSON.stringify(meta)}
 export default ${JSON.stringify(outputs)}
-    `)
-  }
-  return injectWebpackPath(`module.exports = ${JSON.stringify(outputs)}`)
+  `)
 }
 
 async function generateLqipAsync(input) {
@@ -89,8 +92,4 @@ function parseSize(size) {
   const getGroups = v => ensureW(ensureH(v.exec(size).groups))
 
   return getGroups(variant1) || getGroups(variant2)
-}
-
-function injectWebpackPath(s = '') {
-  return s.replace(/\.\/img\//g, `"+__webpack_public_path__+"img/`)
 }
