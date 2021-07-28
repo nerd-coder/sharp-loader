@@ -1,6 +1,6 @@
 {
   "name": "@nerd-coder/sharp-loader",
-  "version": "0.6.5",
+  "version": "1.0.0",
   "description": "Sharp Loader for webpack",
   "main": "src/index.js",
   "repository": "github:nerd-coder/sharp-loader",
