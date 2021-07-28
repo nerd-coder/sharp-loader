@@ -1,8 +1,8 @@
-import { getOptions, parseQuery, interpolateName } from 'loader-utils'
-import validateOptions from 'schema-utils'
-import schema from './schema.json'
-import sharp from 'sharp'
+const { getOptions, parseQuery, interpolateName } = require('loader-utils')
+const { validate } = require('schema-utils')
+const sharp = require('sharp')
 
+const schema = require('./schema.json')
 const DEFAULT_OPTIONS = {
   sizes: [],
   lqip: false,
@@ -20,14 +20,14 @@ const injectWebpackPath = (s = '') => s.replace(/\.\/img\//g, `"+__webpack_publi
  * @param {string | Buffer} source
  * @this {import('webpack').loader.LoaderContext}
  */
-export default async function sharpLoader(source) {
+module.exports = async function sharpLoader(source) {
   const options = {
     ...DEFAULT_OPTIONS,
     ...getOptions(this),
     ...parseQuery(this.resourceQuery),
   }
   options.sizes = ensureArray(splitIfString(options.sizes))
-  validateOptions(schema, options)
+  validate(schema, options)
   if (!(source instanceof Buffer)) throw new Error('`source` should be raw file data')
 
   const input = sharp(source)
